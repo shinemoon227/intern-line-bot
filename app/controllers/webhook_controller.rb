@@ -33,6 +33,15 @@ class WebhookController < ApplicationController
           response = client.get_message_content(event.message['id'])
           tf = Tempfile.open("content")
           tf.write(response.body)
+        when Line::Bot::Event::MessageType::Location
+          title = event.message['title']
+          address = event.message['address']
+          now_location = (title.nil?) ? (address + '付近') : (title)
+          message = {
+            type: 'text',
+            text: 'あなたは現在' + now_location + 'にいますね？'
+          }
+          client.reply_message(event['replyToken'], message)
         end
       end
     }
