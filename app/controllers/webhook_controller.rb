@@ -35,7 +35,7 @@ class WebhookController < ApplicationController
           tf.write(response.body)
         when Line::Bot::Event::MessageType::Location
           title = event.message['title']
-          address = event.message['address']
+          address = event.message['address'].gsub(/日本、|〒\d{3}-\d{4}/, '')
           now_location = title || address + '付近'
           message = {
             type: 'text',
