@@ -71,6 +71,11 @@ LINE DeveloperコンソールのChannel基本設定から、以下を設定。
 $ heroku logs --tail
 ```
 
+## Q. railsのログが見たい
+```
+$ tail -f log/development.log
+```
+
 ## Q. masterブランチ以外をherokuにデプロイしたい
 ```
 $ git push heroku feature/xxxxx:master -f
