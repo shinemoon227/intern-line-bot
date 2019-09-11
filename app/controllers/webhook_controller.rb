@@ -36,10 +36,10 @@ class WebhookController < ApplicationController
         when Line::Bot::Event::MessageType::Location
           title = event.message['title']
           address = event.message['address']
-          now_location = (title.nil?) ? (address + '付近') : (title)
+          now_location = title || address + '付近'
           message = {
             type: 'text',
-            text: 'あなたは現在' + now_location + 'にいますね？'
+            text: "あなたは現在#{now_location}にいますね？"
           }
           client.reply_message(event['replyToken'], message)
         end
