@@ -24,9 +24,13 @@ class WebhookController < ApplicationController
       when Line::Bot::Event::Message
         case event.type
         when Line::Bot::Event::MessageType::Text
+          text = event.message['text'].split("\n")
+          route_service = RouteInTokyoService.new
+          route = route_service.get_route_in_tokyo(text[0], text[1])
+          output = route_service.get_route_detail(route)
           message = {
             type: 'text',
-            text: event.message['text']
+            text: output
           }
           client.reply_message(event['replyToken'], message)
         when Line::Bot::Event::MessageType::Image, Line::Bot::Event::MessageType::Video
