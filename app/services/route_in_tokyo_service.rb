@@ -9,7 +9,7 @@ end
 class RouteInTokyoService
 
 	def initialize(line_text)
-		@station_list = line_text.split("\n")
+		@station_list = split_station_name(line_text)
 		@route_text = ""
 	end
 
@@ -18,12 +18,11 @@ class RouteInTokyoService
 		uri = URI.parse(path)
 		begin
 			response = Net::HTTP.get_response(uri)
+			hash = JSON.parse(response.body)
+			route_detail(hash)
 			raise InvalidStationError if !access?(response.code)
 		rescue => exception
 			route_error()
-		else
-			hash = JSON.parse(response.body)
-			route_detail(hash)
 		end
 		return @route_text
 	end
@@ -40,6 +39,15 @@ class RouteInTokyoService
 
 	def access?(code)
 		return code == "200"
+	end
+
+	def split_station_name(text)
+		text = text.gsub(/(( |　)*(から|,|、)( |　)*)|( +|　+)/, "\n") # 「から」という文字やカンマ（前後にスペースがあっても良い）およびスペースを改行文字に置換
+		text = text.gsub(/((まで|への)|([へに][至行向着移往通参])).*/, "") # 「まで」「への」および「へ行く」「に向かう」などに続く文字を消去
+		text = text.gsub(/(\n)+/, "\n") # 連続した改行文字を1つにする
+		splitted_list = text.split("\n")
+		splitted_list.map!{ |station| (station[-1] == '駅') ? station.chop() : station }
+		return splitted_list
 	end
 
 	def departure_station_name(each_route)
