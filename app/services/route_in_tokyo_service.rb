@@ -18,9 +18,9 @@ class RouteInTokyoService
 		uri = URI.parse(path)
 		begin
 			response = Net::HTTP.get_response(uri)
+			raise InvalidStationError if !access?(response.code)
 			hash = JSON.parse(response.body)
 			route_detail(hash)
-			raise InvalidStationError if !access?(response.code)
 		rescue => exception
 			route_error()
 		end
