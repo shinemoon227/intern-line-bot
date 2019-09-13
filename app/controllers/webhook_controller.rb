@@ -24,10 +24,17 @@ class WebhookController < ApplicationController
       when Line::Bot::Event::Message
         case event.type
         when Line::Bot::Event::MessageType::Text
-          text = event.message['text'].split("\n")
-          route_service = RouteInTokyoService.new
-          route = route_service.get_route_in_tokyo(text[0], text[1])
-          output = route_service.get_route_detail(route)
+          route_service = RouteInTokyoService.new(event.message['text'])
+          station_list = route_service.entered_station()
+          len = route_service.route_length()
+          output = 
+            if len == 2
+              route_service.route_in_tokyo(station_list[0], station_list[1])
+            elsif len < 2
+              "駅の数が少なすぎます。駅名は2つ入力してください。"
+            else
+              "駅の数が多すぎます。駅名は2つ入力してください。"
+            end
           message = {
             type: 'text',
             text: output
